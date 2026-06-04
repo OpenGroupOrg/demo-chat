@@ -18,8 +18,8 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      console.log(await register(formData))
-      console.log('Registered Successfully !')
+      await register(formData)
+      console.info('Registered Successfully !')
     } catch (error) {
       console.error('Login failed:', error);
       setErrorMsg(error.response.data.message);
@@ -45,7 +45,7 @@ export default function RegisterForm() {
             required
           />
         </label>
-        <div class="validator-hint hidden">Enter valid name</div>
+        <div className="validator-hint hidden">Enter valid name</div>
 
         <label className="input validator w-full pl-1" htmlFor="email">
           <AtSymbolIcon height={"90%"} />
@@ -60,7 +60,7 @@ export default function RegisterForm() {
             required
           />
         </label>
-        <div class="validator-hint hidden">Enter valid email address</div>
+        <div className="validator-hint hidden">Enter valid email address</div>
 
         <label className="input validator w-full pl-1" htmlFor="password">
           <KeyIcon height={"90%"} />
@@ -76,7 +76,7 @@ export default function RegisterForm() {
             required
           />
         </label>
-        <div class="validator-hint hidden">Enter valid password</div>
+        <div className="validator-hint hidden">Enter valid password</div>
 
         <label className="input validator w-full pl-1" htmlFor="password">
           <KeyIconOutline height={"90%"} />
@@ -92,7 +92,7 @@ export default function RegisterForm() {
             required
           />
         </label>
-        <div class="validator-hint hidden">Enter valid password</div>
+        <div className="validator-hint hidden">Enter valid password</div>
 
         {errorMsg && <div className="text-error">{errorMsg}</div>}
 
@@ -102,7 +102,7 @@ export default function RegisterForm() {
           disabled={loading}
         >
           {loading ?
-            <spin class="loading loading-infinity loading-xl text-primary"></spin>
+            <spin className="loading loading-infinity loading-xl text-primary"></spin>
             :
             'Login'
           }

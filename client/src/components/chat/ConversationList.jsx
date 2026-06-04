@@ -8,6 +8,7 @@ import moment from 'jalali-moment'
 export default function ConversationList() {
   const { data: conversations, loading } = apiGet('/api/conversations')
   const { user } = useAuth()
+
   const getUnreadMsgs = (conversation) => {
     const participants = conversation.participants
     const msgs_participant = conversation
@@ -37,7 +38,7 @@ export default function ConversationList() {
             <div className="flex-1 flex">
               <div className="grow">
                 <h3 className="font-semibold">{convo.name}</h3>
-                <p className="text-sm text-gray-400">
+                <div className="text-sm text-gray-400">
                   {!convo.messages[0] ?
                     <span className="opacity-50">No Messages !</span>
                     :
@@ -49,7 +50,7 @@ export default function ConversationList() {
                       {convo.messages[0].content}
                     </div>
                   }
-                </p>
+                </div>
               </div>
               <div className="flex flex-col justify-around">
                 {convo.messages[0] &&

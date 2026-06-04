@@ -22,12 +22,12 @@ export default function ConversationNewForm() {
   })
   const { data: users, loading: loadingUsers } = apiGet('/api/users', apiData)
   const { data: conversation, loading, apiRefresh } = apiPost('/api/conversations', data, false)
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       apiRefresh()
-      console.log('Created Successfully !')
+      console.info('Created Successfully !')
     } catch (error) {
       console.error('Login failed:', error);
       setErrorMsg(error.response.data.message);
@@ -73,7 +73,7 @@ export default function ConversationNewForm() {
             required
           />
         </label>
-        <div class="validator-hint hidden">Enter valid name</div>
+        <div className="validator-hint hidden">Enter valid name</div>
 
         <div className="validator pl-1" htmlFor="type">
           <label htmlFor="type_group">
@@ -102,19 +102,19 @@ export default function ConversationNewForm() {
             />
           </label>
         </div>
-        <div class="validator-hint hidden">Enter valid type</div>
+        <div className="validator-hint hidden">Enter valid type</div>
 
         <label className="input w-full">
           <span className="label !me-0">Participants </span>
           <SearchableSelect
-            disabled = {data.type == ''}
+            disabled={data.type == ''}
             isMultiple={data.type == 'group'}
             inputName='users'
             options={users}
             onSearch={(q) => onSearchUser(q)}
-            onChange={(users) => setData({ ...data, users: users.map(user=>user.id)})}
+            onChange={(users) => setData({ ...data, users: users.map(user => user.id) })}
             loading={loadingUsers}
-            getShowInfo={(user) =>{ return {title: user.name, value: user.id} } }
+            getShowInfo={(user) => { return { title: user.name, value: user.id } }}
             className="w-full"
           />
         </label>
@@ -131,7 +131,7 @@ export default function ConversationNewForm() {
           disabled={loading}
         >
           {loading ?
-            <spin class="loading loading-infinity loading-xl text-primary"></spin>
+            <spin className="loading loading-infinity loading-xl text-primary"></spin>
             :
             'Make Conversation'
           }

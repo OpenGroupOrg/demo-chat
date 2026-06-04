@@ -8,7 +8,7 @@ export default function SearchableSelect({ isMultiple, onSearch, onChange, optio
   // Handle selecting an option
   const handleOptionClick = (option, e) => {
     e.preventDefault()
-    console.log('option checked:', option)
+
     const optionValue = option
     let newOptions = optionValue
     if (isMultiple) {
@@ -49,7 +49,7 @@ export default function SearchableSelect({ isMultiple, onSearch, onChange, optio
           (
             <div className="w-full">
               {getShowInfo(selectedOptions[0]).title}
-              <span class="indicator-item indicator-middle indicator-end badge badge-info">+{selectedOptions.length-1}</span>
+              <span className="indicator-item indicator-middle indicator-end badge badge-info">+{selectedOptions.length - 1}</span>
             </div>
           )
           : getShowInfo(selectedOptions[0]).title
@@ -59,14 +59,14 @@ export default function SearchableSelect({ isMultiple, onSearch, onChange, optio
       {/* Dropdown Menu */}
       <div className="dropdown-content menu bg-base-100 rounded-box z-1 w-full min-w-52 p-2 shadow-sm">
         {/* Search Input */}
-        <label class="input">
+        <label className="input">
           {loading ?
             <span className="loading loading-spinner text-info h-full"></span>
             :
             <MagnifyingGlassIcon className="h-full" />
           }
           <input type="search"
-            class="grow"
+            className="grow"
             placeholder="Search"
             value={searchTerm}
             onChange={(e) => onSearching(e)}

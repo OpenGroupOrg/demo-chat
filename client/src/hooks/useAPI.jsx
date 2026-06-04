@@ -95,6 +95,29 @@ export function apiPost(endpoint, initialData = null, hasAutoRefresh = true) {
   return { data, loading, error, apiRefresh }
 }
 
+/*export function apiDelete(endpoint) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const remove = async (overrideEndpoint) => {
+    try {
+      setLoading(true)
+
+      const url = overrideEndpoint || endpoint
+      const response = await api.delete(url)
+
+      return response.data
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { remove, loading, error }
+}*/
+
 export function apiDelete(endpoint, initialData = null, hasAutoRefresh = true) {
   const [data, setData] = useState(initialData)
   const [loading, setLoading] = useState(true)

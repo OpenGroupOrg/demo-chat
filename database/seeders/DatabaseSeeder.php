@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
         User::factory(20)->create();
 
         $user = User::factory()->create([
-            'name' => 'abol',
-            'email' => 'abol@gmail.com',
+            'name' => 'c14r',
+            'email' => 'mail@c14r.de',
         ]);
 
         // Create a private conversation
@@ -29,14 +29,14 @@ class DatabaseSeeder extends Seeder
         // Create a group conversation
         $groupConv = Conversation::factory(20)->group()->create();
 
-        
+
         Participant::factory(100)
             ->create();
-        
+
         Participant::factory(100)
             ->for($user)
             ->create();
-        
+
         Message::factory(200)
             ->createQuietly();
 
@@ -47,7 +47,5 @@ class DatabaseSeeder extends Seeder
                 ->for($conversation)
                 ->createQuietly();
         });
-
-
     }
 }
