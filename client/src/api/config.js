@@ -5,16 +5,18 @@ const api = axios.create({
     withCredentials: true,
 });
 
-await api.get('/sanctum/csrf-cookie')
-
-
 api.interceptors.request.use(config => {
     const token = localStorage.getItem('auth_token');
     const token_type = localStorage.getItem('auth_type');
-    if (token) {
+
+    // Wenn ein Token da ist, anhängen
+    if (token && token_type) {
         config.headers.Authorization = `${token_type} ${token}`;
     }
+
     return config;
+}, (error) => {
+    return Promise.reject(error);
 });
 
 export default api;

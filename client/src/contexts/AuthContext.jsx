@@ -1,58 +1,46 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { fetchUser, loginUser, registerUser, logoutUser } from '../api/auth'
+import { createContext, useContext } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetchUser, logoutUser } from '../api/auth'
 
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const queryClient = useQueryClient()
 
-    useEffect(() => {
-        const initAuth = async () => {
-            try {
-                authUser()
-            } catch (error) {
-                setUser(null)
-                setLoading(false)
-            }
-        }
-        initAuth()
-    }, [])
+    const hasToken = !!localStorage.getItem('auth_token')
 
-    const authUser = async () => {
-        const userData = await fetchUser().finally(() => setLoading(false))
-        setUser(userData)
-        return userData
-    }
+    const { data: user, isLoading } = useQuery({
+        queryKey: ['authUser'],
+        queryFn: fetchUser,
+        retry: false,
+        enabled: hasToken,
+    })
 
-    const login = async (credentials) => {
-        setLoading(true)
-        const response = await loginUser(credentials).finally(() => setLoading(false))
-        localStorage.setItem('auth_token', response.access_token)
-        localStorage.setItem('auth_type', response.token_type)
-        return await authUser()
-    }
-
-    const register = async (userInfo) => {
-        setLoading(true)
-        const response = await registerUser(userInfo).finally(() => setLoading(false))
-        localStorage.setItem('auth_token', response.access_token)
-        localStorage.setItem('auth_type', response.token_type)
-        return await authUser()
+    const setUser = (userData) => {
+        queryClient.setQueryData(['authUser'], userData)
     }
 
     const logout = async () => {
-        await logoutUser()
-        setUser(null)
+        try {
+            await logoutUser()
+        } catch (error) {
+            console.error("Fehler beim Logout-Request", error)
+        } finally {
+            localStorage.removeItem('auth_token')
+            localStorage.removeItem('auth_type')
+
+            queryClient.setQueryData(['authUser'], null)
+        }
     }
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
-            {loading &&
+        <AuthContext.Provider value={{ user: user || null, setUser, logout }}>
+            {isLoading && hasToken && (
                 <div className="fixed bg-base-100 z-50 left-0 top-0 w-screen h-screen flex flex-col items-center justify-center">
                     <span className="loading loading-infinity text-info w-20"></span>
                 </div>
-            }
+            )}
+
             {children}
         </AuthContext.Provider>
     )

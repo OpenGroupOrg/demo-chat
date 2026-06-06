@@ -2,9 +2,12 @@ import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/solid'
 import SearchableSelect from '../ui/SearchableSelect'
-import { apiGet, apiPost } from '../../hooks/useAPI'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import api from '../../api/config'
 
 export default function ConversationNewForm() {
+    const queryClient = useQueryClient()
+
     const [data, setData] = useState({
         type: '',
         name: '',
@@ -12,47 +15,54 @@ export default function ConversationNewForm() {
     })
 
     const [errorMsg, setErrorMsg] = useState('')
-    const [apiAbort, setApiAbort] = useState(new AbortController())
 
-    const [apiData, setApiData] = useState({
-        params: {
-            q: null,
-        },
-        signal: apiAbort.signal,
-    })
-    const { data: users, loading: loadingUsers } = apiGet('/api/users', apiData)
-    const { data: conversation, loading, apiRefresh } = apiPost('/api/conversations', data, false)
+    // React Query übernimmt den AbortController, wir brauchen nur den Suchbegriff!
+    const [searchTerm, setSearchTerm] = useState('')
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            apiRefresh()
-            console.info('Created Successfully !')
-        } catch (error) {
-            console.error('Login failed:', error);
-            setErrorMsg(error.response.data.message);
+    // 1. Users laden (mit automatischem Abort beim Tippen)
+    const { data: users, isLoading: loadingUsers } = useQuery({
+        // Der queryKey enthält jetzt den searchTerm. Ändert sich der Term, 
+        // wird automatisch neu geladen und der alte Request abgebrochen.
+        queryKey: ['users', searchTerm],
+        queryFn: async ({ signal }) => { // signal kommt automatisch von React Query!
+            const response = await api.get('/api/users', {
+                params: { q: searchTerm || undefined },
+                signal: signal
+            })
+            return response.data
         }
+    })
+
+    // 2. Mutation für die neue Konversation
+    const createConversation = useMutation({
+        mutationFn: async (newConversation) => {
+            const response = await api.post('/api/conversations', newConversation)
+            return response.data
+        },
+        onSuccess: () => {
+            // Nach Erfolg: Liste aktualisieren!
+            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            console.info('Created Successfully !')
+            setErrorMsg('')
+            // Optional: setData({...}) um das Formular wieder zu leeren
+        },
+        onError: (error) => {
+            console.error('Creation failed:', error);
+            setErrorMsg(error.response?.data?.message || 'Creation failed');
+        }
+    })
+
+    // 3. Form Submit
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        // Mutate führt die mutationFn aus (try/catch ist intern in onError/onSuccess geregelt)
+        createConversation.mutate(data)
     }
 
+    // 4. Suche updaten
     const onSearchUser = (filter) => {
-        if (filter != apiData.params.q) {
-            let newAborter = apiAbort
-            if (loadingUsers) {
-                apiAbort.abort()
-                newAborter = new AbortController()
-                setApiAbort(newAborter)
-            }
-            setApiData(prev => {
-                const newData = {
-                    params: {
-                        q: filter,
-                    },
-                    signal: newAborter.signal,
-                }
-
-                // apiRefresh()
-                return newData
-            })
+        if (filter !== searchTerm) {
+            setSearchTerm(filter)
         }
     }
 
@@ -60,7 +70,7 @@ export default function ConversationNewForm() {
         <div className="flex flex-col h-full">
             <h2 className="text-3xl mb-2 border-b border-b-base-content">Make new Conversation</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 grow">
-                <label className="input validator w-full pl-1" htmlFor="type">
+                <label className="input validator w-full pl-1" htmlFor="name">
                     <AtSymbolIcon height={"90%"} />
 
                     <input
@@ -75,7 +85,7 @@ export default function ConversationNewForm() {
                 </label>
                 <div className="validator-hint hidden">Enter valid name</div>
 
-                <div className="validator pl-1" htmlFor="type">
+                <div className="validator pl-1">
                     <label htmlFor="type_group">
                         <span className="mx-2 label"> Group </span>
                         <input
@@ -107,30 +117,28 @@ export default function ConversationNewForm() {
                 <label className="input w-full">
                     <span className="label !me-0">Participants </span>
                     <SearchableSelect
-                        disabled={data.type == ''}
-                        isMultiple={data.type == 'group'}
+                        disabled={data.type === ''}
+                        isMultiple={data.type === 'group'}
                         inputName='users'
-                        options={users}
+                        options={users || []} // Falls users undefined ist, Fallback auf leeres Array
                         onSearch={(q) => onSearchUser(q)}
-                        onChange={(users) => setData({ ...data, users: users.map(user => user.id) })}
+                        onChange={(selectedUsers) => setData({ ...data, users: selectedUsers.map(user => user.id) })}
                         loading={loadingUsers}
                         getShowInfo={(user) => { return { title: user.name, value: user.id } }}
                         className="w-full"
                     />
                 </label>
 
-                <div className="grow">
-
-                </div>
+                <div className="grow"></div>
 
                 {errorMsg && <div className="text-error">{errorMsg}</div>}
 
                 <button
                     type="submit"
                     className="btn btn-primary w-full grow-0"
-                    disabled={loading}
+                    disabled={createConversation.isPending}
                 >
-                    {loading ?
+                    {createConversation.isPending ?
                         <span className="loading loading-infinity loading-xl text-primary"></span>
                         :
                         'Make Conversation'

@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom'
 import UserAvatar from '../ui/UserAvatar'
-import { apiPost } from '../../hooks/useAPI'
 import { useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import api from '../../api/config'
 
 export default function Navbar({ user }) {
-    const { data: logoutData, loading: logoutLoading, apiRefresh: reLogout } = apiPost('/api/logout', null, false)
+    const { data: logoutData, isLoading: logoutLoading, mutate: reLogout } = useMutation({
+        mutationFn: async () => {
+            const response = await api.post('/api/logout')
+            return response.data
+        }
+    })
 
     const onLogout = () => {
         reLogout()

@@ -20,3 +20,7 @@ export const fetchUser = async () => {
     const { data } = await api.get('/api/user')
     return data
 }
+
+export function hasApiKey() {
+    return localStorage.getItem('auth_token') && localStorage.getItem('auth_type')
+}

@@ -16,7 +16,7 @@ class MessageController extends Controller
     public function index(Conversation $conversation)
     {
         $this->authorize('view', $conversation);
-        
+
         return $conversation->messages()
             ->with(['user', 'conversation'])
             ->latest()
@@ -27,8 +27,8 @@ class MessageController extends Controller
     {
 
         $attachments = [];
-        if($request->hasFile('attachments'))
-            foreach($request->file('attachments') as $file){
+        if ($request->hasFile('attachments'))
+            foreach ($request->file('attachments') as $file) {
                 $filePath = '/storage/' . $file->storePublicly('images');
                 $attachments[] = url($filePath);
             }
@@ -40,7 +40,7 @@ class MessageController extends Controller
         ]);
 
         broadcast(new MessageSent($message))->toOthers();
-        
+
         return response()->json($message->load('user'), 201);
     }
 

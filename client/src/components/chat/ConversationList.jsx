@@ -1,12 +1,19 @@
 import { Link } from 'react-router-dom'
-import { apiGet } from '../../hooks/useAPI'
 import UserAvatar from '../ui/UserAvatar'
 import { useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import moment from 'jalali-moment'
+import { useQuery } from '@tanstack/react-query'
+import api from '../../api/config'
 
 export default function ConversationList() {
-    const { data: conversations, loading } = apiGet('/api/conversations')
+    const { data: conversations, isLoading: loading } = useQuery({
+        queryKey: ['conversations'],
+        queryFn: async () => {
+            const response = await api.get('/api/conversations')
+            return response.data
+        }
+    })
     const { user } = useAuth()
 
     const getUnreadMsgs = (conversation) => {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { hasApiKey } from '../hooks/useAPI'
+import { hasApiKey } from '../api/auth'
 import Footer from '../components/layout/Footer'
 
 export default function HomePage() {

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { apiGet, apiDelete } from '../hooks/useAPI'
 import { echo } from '../api/websocket'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '../api/config'
 
 const ChatContext = createContext()
@@ -12,25 +12,57 @@ export const ChatProvider = ({ children }) => {
     const [typingUsers, setTypingUsers] = useState([])
     const [onlineUsers, setOnlineUsers] = useState([])
 
-    const { data, apiRefresh } = apiGet(`/api/conversations/${conversationId ?? 1}`)
+    const queryClient = useQueryClient()
+    const currentConvId = conversationId ?? 1
 
-    // Delete messages API
-    const [apiDeleteMessageId, setApiDeleteMessageId] = useState(null)
-    const { data: apiDeleteMsgData, loading: apiDeleteMsgLoading, apiRefresh: apiDeleteMsgRefresh } = apiDelete(`/api/conversations/${conversationId}/messages/${apiDeleteMessageId}`, null, true)
-    //const { remove: deleteMessage, loading: apiDeleteMsgLoading } = apiDelete()
+    // 1. Konversation laden
+    const { data, refetch } = useQuery({
+        queryKey: ['conversation', currentConvId],
+        queryFn: async () => {
+            const response = await api.get(`/api/conversations/${currentConvId}`)
+            return response.data
+        }
+    })
 
-    // Send Message
-    const [apiSendMsgLoading, setApiSendMsgLoading] = useState(false)
+    // 2. Nachricht löschen Mutation
+    const deleteMessageMutation = useMutation({
+        mutationFn: async (messageId) => {
+            await api.delete(`/api/conversations/${currentConvId}/messages/${messageId}`)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['conversation', currentConvId] })
+        }
+    })
+
+    // 3. Nachricht senden Mutation (NEU!)
+    const sendMessageMutation = useMutation({
+        mutationFn: async ({ content, files }) => {
+            const formData = new FormData()
+            formData.append('content', content)
+            Array.from(files).forEach(file => formData.append('attachments[]', file))
+
+            const response = await api.post(
+                `/api/conversations/${conversationId}/messages`,
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } }
+            )
+            return response.data
+        }
+    })
+
+    // Neu laden, wenn sich die ID ändert
+    useEffect(() => {
+        if (!conversationId) return
+        refetch() // Hier stand vorher das undefinierte apiRefresh()
+    }, [conversationId, refetch])
 
     // WebSocket Handlers
     useEffect(() => {
-        if (!conversationId) return
-        apiRefresh()
-    }, [conversationId])
-
-    useEffect(() => {
-        if (data?.messages)
+        if (data?.messages) {
             setMessages(data.messages)
+        }
+
+        if (!conversationId) return
 
         const channel = echo.join(`chat.conversation.${conversationId}`)
             .here(users => setOnlineUsers(users))
@@ -68,8 +100,7 @@ export const ChatProvider = ({ children }) => {
             )
             .listen('MessageDeleted', data => {
                 setMessages(prev => prev.filter(m => m.id !== data.message.id))
-            }
-            )
+            })
             .listen('UserTyping', ({ userId, isTyping }) => {
                 setTypingUsers(prev => isTyping
                     ? [...new Set([...prev, userId])]
@@ -77,32 +108,29 @@ export const ChatProvider = ({ children }) => {
                 )
             })
 
-        // return () => channel.unsubscribe()
-    }, [data])
+        // WICHTIG: Das solltest du in Zukunft eventuell einkommentieren, 
+        // damit du beim Wechseln von Chats keine doppelten Listener hast!
+        // return () => echo.leave(`chat.conversation.${conversationId}`)
+    }, [data, conversationId])
 
+    // Context Value zusammenbauen
     const value = {
         conversation: data,
         messages,
         typingUsers,
         onlineUsers,
-        deleteMessageLoading: apiDeleteMsgLoading,
-        deleteMessage: async (message_id) => {
-            setApiDeleteMessageId(message_id)
-        },
-        sendMessageLoading: apiSendMsgLoading,
-        sendMessage: async (content, files) => {
-            setApiSendMsgLoading(true)
-            const formData = new FormData()
-            formData.append('content', content)
-            Array.from(files).forEach(file => formData.append('attachments[]', file))
 
-            const response = await api.post(
-                `/api/conversations/${conversationId}/messages`,
-                formData,
-                { headers: { 'Content-Type': 'multipart/form-data' } }
-            )
-            setApiSendMsgLoading(false)
-            return response.data
+        // React Query isPending ersetzt deine alten Loading-States
+        deleteMessageLoading: deleteMessageMutation.isPending,
+        deleteMessage: async (message_id) => {
+            deleteMessageMutation.mutate(message_id)
+        },
+
+        sendMessageLoading: sendMessageMutation.isPending,
+        sendMessage: async (content, files) => {
+            // mutateAsync gibt ein Promise zurück, falls du in der Komponente
+            // auf das Ergebnis warten willst (z.B. um das Textfeld zu leeren)
+            return await sendMessageMutation.mutateAsync({ content, files })
         }
     }
 

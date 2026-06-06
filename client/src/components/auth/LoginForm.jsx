@@ -1,31 +1,44 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/solid'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import { loginUser } from '../../api/auth'
 
 export default function LoginForm() {
     const [credentials, setCredentials] = useState({ email: '', password: '' })
-    const { login, loading } = useAuth()
-    const [errorMsg, setErrorMsg] = useState('')
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            await login(credentials)
-            console.info('Logined Successfully !')
-        } catch (error) {
-            console.error('Login failed:', error);
-            setErrorMsg(error.response.data.message);
+    const { setUser } = useAuth()
+    const navigate = useNavigate()
+
+    const loginMutation = useMutation({
+        mutationFn: loginUser,
+        onSuccess: (data) => {
+            console.info('Logged in Successfully!')
+
+            // Tokens speichern
+            localStorage.setItem('auth_token', data.token)
+            localStorage.setItem('auth_type', 'Bearer')
+
+            if (data.user) {
+                setUser(data.user)
+            }
+
+            navigate('/')
         }
+    })
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        loginMutation.mutate(credentials)
     }
 
     return (
         <>
-            <h2 className="-mt-17 mb-7 pt-2 text-3xl ">Login - Welcome back !</h2>
+            <h2 className="-mt-17 mb-7 pt-2 text-3xl">Login - Welcome back !</h2>
             <form onSubmit={handleSubmit} className="space-y-2">
                 <label className="input validator w-full pl-1" htmlFor="email">
                     <AtSymbolIcon height={"90%"} />
-
                     <input
                         type="email"
                         className="w-full"
@@ -40,7 +53,6 @@ export default function LoginForm() {
 
                 <label className="input validator w-full pl-1" htmlFor="password">
                     <KeyIcon height={"90%"} />
-
                     <input
                         type="password"
                         className="w-full"
@@ -54,14 +66,19 @@ export default function LoginForm() {
                 </label>
                 <div className="validator-hint hidden">Enter valid password</div>
 
-                {errorMsg && <div className="text-error">{errorMsg}</div>}
+                {/* Fehler sicher abfangen mit Optional Chaining (?.) */}
+                {loginMutation.isError && (
+                    <div className="text-error">
+                        {loginMutation.error.response?.data?.message || 'Login failed. Please check your credentials.'}
+                    </div>
+                )}
 
                 <button
                     type="submit"
                     className="btn btn-primary w-full"
-                    disabled={loading}
+                    disabled={loginMutation.isPending}
                 >
-                    {loading ?
+                    {loginMutation.isPending ?
                         <span className="loading loading-infinity loading-xl text-primary"></span>
                         :
                         'Login'
@@ -71,7 +88,7 @@ export default function LoginForm() {
 
             <div className="text-center mt-4">
                 <Link to="/register" className="link link-primary text-sm">
-                    Already not registered ? Signup
+                    Not registered yet? Signup
                 </Link>
             </div>
         </>
