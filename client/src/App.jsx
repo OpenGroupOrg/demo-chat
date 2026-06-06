@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/Auth/LoginPage'
 import RegisterPage from './pages/Auth/RegisterPage'
 
-import ChatHome from './pages/Chat/ChatHome'
+import ChatHomePage from './pages/Chat/ChatHomePagePage'
 import ConversationPage from './pages/Chat/ConversationPage'
 
 import { ChatProvider } from './contexts/ChatContext'
@@ -50,7 +50,7 @@ export default function App() {
                 {/* Nur für eingeloggte Benutzer */}
                 <Route element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>
-                        <Route path="/chat" element={<ChatHome />} />
+                        <Route path="/chat" element={<ChatHomePage />} />
                         <Route
                             path="/chat/:conversationId"
                             element={
@@ -75,7 +75,7 @@ import AuthLayout from './components/layout/AuthLayout'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/Auth/LoginPage'
 import RegisterPage from './pages/Auth/RegisterPage'
-import ChatHome from './pages/Chat/ChatHome'
+import ChatHomePage from './pages/Chat/ChatHomePage'
 import ConversationPage from './pages/Chat/ConversationPage'
 import { ChatProvider } from './contexts/ChatContext'
 
@@ -94,7 +94,7 @@ export default function App() {
           </Route>
           :
           <Route element={<MainLayout />}>
-            <Route path="/chat" element={<ChatHome />} />
+            <Route path="/chat" element={<ChatHomePage />} />
             <Route path="/chat/:conversationId" element={
               <ChatProvider>
                 <ConversationPage />

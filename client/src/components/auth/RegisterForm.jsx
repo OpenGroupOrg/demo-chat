@@ -102,7 +102,7 @@ export default function RegisterForm() {
                     disabled={loading}
                 >
                     {loading ?
-                        <spin className="loading loading-infinity loading-xl text-primary"></spin>
+                        <span className="loading loading-infinity loading-xl text-primary"></span>
                         :
                         'Login'
                     }

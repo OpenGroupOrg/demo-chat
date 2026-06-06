@@ -131,7 +131,7 @@ export default function ConversationNewForm() {
                     disabled={loading}
                 >
                     {loading ?
-                        <spin className="loading loading-infinity loading-xl text-primary"></spin>
+                        <span className="loading loading-infinity loading-xl text-primary"></span>
                         :
                         'Make Conversation'
                     }

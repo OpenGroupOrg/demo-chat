@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import ConversationNewForm from '../../components/chat/ConversationNewForm'
 import { PlusIcon } from '@heroicons/react/24/solid'
 
-export default function ChatHome() {
+export default function ChatHomePage() {
 	const { user } = useAuth()
 	const conversationModalRef = useRef()
 

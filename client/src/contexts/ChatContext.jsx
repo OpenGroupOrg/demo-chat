@@ -22,7 +22,6 @@ export const ChatProvider = ({ children }) => {
     // Send Message
     const [apiSendMsgLoading, setApiSendMsgLoading] = useState(false)
 
-
     // WebSocket Handlers
     useEffect(() => {
         if (!conversationId) return
@@ -32,6 +31,7 @@ export const ChatProvider = ({ children }) => {
     useEffect(() => {
         if (data?.messages)
             setMessages(data.messages)
+
         const channel = echo.join(`chat.conversation.${conversationId}`)
             .here(users => setOnlineUsers(users))
             .joining(user => setOnlineUsers(prev => [...prev, user]))
