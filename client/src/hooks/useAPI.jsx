@@ -2,97 +2,97 @@ import { useState, useEffect } from 'react'
 import api from '../api/config'
 
 export function apiGet(endpoint, initialData = null, hasAutoRefresh = true) {
-  const [data, setData] = useState(initialData)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+    const [data, setData] = useState(initialData)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
-  const request = async () => {
-    try {
-      setLoading(true)
-      const response = await api.get(endpoint, initialData)
-      setData(response.data)
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred')
-    } finally {
-      setLoading(false)
+    const request = async () => {
+        try {
+            setLoading(true)
+            const response = await api.get(endpoint, initialData)
+            setData(response.data)
+        } catch (err) {
+            setError(err.response?.data?.message || 'An error occurred')
+        } finally {
+            setLoading(false)
+        }
     }
-  }
 
-  const apiRefresh = (_endpoint = null) => {
-    if (_endpoint)
-      endpoint = _endpoint
-    request()
-  }
+    const apiRefresh = (_endpoint = null) => {
+        if (_endpoint)
+            endpoint = _endpoint
+        request()
+    }
 
-  useEffect(() => {
-    if (hasAutoRefresh)
-      apiRefresh()
-  }, [endpoint, initialData])
+    useEffect(() => {
+        if (hasAutoRefresh)
+            apiRefresh()
+    }, [endpoint, initialData])
 
-  // return { data, loading, error, apiRefresh, apiSucceed, apiFailed}
-  return { data, loading, error, apiRefresh }
+    // return { data, loading, error, apiRefresh, apiSucceed, apiFailed}
+    return { data, loading, error, apiRefresh }
 }
 
 export function apiPut(endpoint, initialData = null, hasAutoRefresh = true) {
-  const [data, setData] = useState(initialData)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+    const [data, setData] = useState(initialData)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
-  const request = async () => {
-    try {
-      setLoading(true)
-      const response = await api.put(endpoint, initialData)
-      setData(response.data)
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred')
-    } finally {
-      setLoading(false)
+    const request = async () => {
+        try {
+            setLoading(true)
+            const response = await api.put(endpoint, initialData)
+            setData(response.data)
+        } catch (err) {
+            setError(err.response?.data?.message || 'An error occurred')
+        } finally {
+            setLoading(false)
+        }
     }
-  }
 
-  const apiRefresh = (_endpoint = null) => {
-    if (_endpoint)
-      endpoint = _endpoint
-    request()
-  }
+    const apiRefresh = (_endpoint = null) => {
+        if (_endpoint)
+            endpoint = _endpoint
+        request()
+    }
 
-  useEffect(() => {
-    if (hasAutoRefresh)
-      apiRefresh()
-  }, [endpoint, initialData])
+    useEffect(() => {
+        if (hasAutoRefresh)
+            apiRefresh()
+    }, [endpoint, initialData])
 
-  return { data, loading, error, apiRefresh }
+    return { data, loading, error, apiRefresh }
 }
 
 export function apiPost(endpoint, initialData = null, hasAutoRefresh = true) {
-  const [data, setData] = useState(initialData)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+    const [data, setData] = useState(initialData)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
 
-  const request = async () => {
-    try {
-      setLoading(true)
-      const response = await api.post(endpoint, initialData)
-      setData(response.data)
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred')
-    } finally {
-      setLoading(false)
+    const request = async () => {
+        try {
+            setLoading(true)
+            const response = await api.post(endpoint, initialData)
+            setData(response.data)
+        } catch (err) {
+            setError(err.response?.data?.message || 'An error occurred')
+        } finally {
+            setLoading(false)
+        }
     }
-  }
 
-  const apiRefresh = (_endpoint = null) => {
-    if (_endpoint)
-      endpoint = _endpoint
-    request()
-  }
+    const apiRefresh = (_endpoint = null) => {
+        if (_endpoint)
+            endpoint = _endpoint
+        request()
+    }
 
-  useEffect(() => {
-    if (hasAutoRefresh)
-      apiRefresh()
-  }, [endpoint, initialData])
+    useEffect(() => {
+        if (hasAutoRefresh)
+            apiRefresh()
+    }, [endpoint, initialData])
 
-  return { data, loading, error, apiRefresh }
+    return { data, loading, error, apiRefresh }
 }
 
 /*export function apiDelete(endpoint) {
@@ -119,36 +119,36 @@ export function apiPost(endpoint, initialData = null, hasAutoRefresh = true) {
 }*/
 
 export function apiDelete(endpoint, initialData = null, hasAutoRefresh = true) {
-  const [data, setData] = useState(initialData)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+    const [data, setData] = useState(initialData)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
-  const request = async () => {
-    try {
-      setLoading(true)
-      const response = await api.delete(endpoint, initialData)
-      setData(response.data)
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred')
-    } finally {
-      setLoading(false)
+    const request = async () => {
+        try {
+            setLoading(true)
+            const response = await api.delete(endpoint, initialData)
+            setData(response.data)
+        } catch (err) {
+            setError(err.response?.data?.message || 'An error occurred')
+        } finally {
+            setLoading(false)
+        }
     }
-  }
 
-  const apiRefresh = (_endpoint = null) => {
-    if (_endpoint)
-      endpoint = _endpoint
-    request()
-  }
+    const apiRefresh = (_endpoint = null) => {
+        if (_endpoint)
+            endpoint = _endpoint
+        request()
+    }
 
-  useEffect(() => {
-    if (hasAutoRefresh)
-      apiRefresh()
-  }, [endpoint, initialData])
+    useEffect(() => {
+        if (hasAutoRefresh)
+            apiRefresh()
+    }, [endpoint, initialData])
 
-  return { data, loading, error, apiRefresh }
+    return { data, loading, error, apiRefresh }
 }
 
 export function hasApiKey() {
-  return localStorage.getItem('auth_token') && localStorage.getItem('auth_type')
+    return localStorage.getItem('auth_token') && localStorage.getItem('auth_type')
 }

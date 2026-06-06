@@ -2,141 +2,141 @@ import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/solid'
 import SearchableSelect from '../ui/SearchableSelect'
-import { apiGet, apiPost } from '../../hooks/useApi'
+import { apiGet, apiPost } from '../../hooks/useAPI'
 
 export default function ConversationNewForm() {
-  const [data, setData] = useState({
-    type: '',
-    name: '',
-    users: null,
-  })
+    const [data, setData] = useState({
+        type: '',
+        name: '',
+        users: null,
+    })
 
-  const [errorMsg, setErrorMsg] = useState('')
-  const [apiAbort, setApiAbort] = useState(new AbortController())
+    const [errorMsg, setErrorMsg] = useState('')
+    const [apiAbort, setApiAbort] = useState(new AbortController())
 
-  const [apiData, setApiData] = useState({
-    params: {
-      q: null,
-    },
-    signal: apiAbort.signal,
-  })
-  const { data: users, loading: loadingUsers } = apiGet('/api/users', apiData)
-  const { data: conversation, loading, apiRefresh } = apiPost('/api/conversations', data, false)
+    const [apiData, setApiData] = useState({
+        params: {
+            q: null,
+        },
+        signal: apiAbort.signal,
+    })
+    const { data: users, loading: loadingUsers } = apiGet('/api/users', apiData)
+    const { data: conversation, loading, apiRefresh } = apiPost('/api/conversations', data, false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      apiRefresh()
-      console.info('Created Successfully !')
-    } catch (error) {
-      console.error('Login failed:', error);
-      setErrorMsg(error.response.data.message);
-    }
-  }
-
-  const onSearchUser = (filter) => {
-    if (filter != apiData.params.q) {
-      let newAborter = apiAbort
-      if (loadingUsers) {
-        apiAbort.abort()
-        newAborter = new AbortController()
-        setApiAbort(newAborter)
-      }
-      setApiData(prev => {
-        const newData = {
-          params: {
-            q: filter,
-          },
-          signal: newAborter.signal,
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try {
+            apiRefresh()
+            console.info('Created Successfully !')
+        } catch (error) {
+            console.error('Login failed:', error);
+            setErrorMsg(error.response.data.message);
         }
-
-        // apiRefresh()
-        return newData
-      })
     }
-  }
 
-  return (
-    <div className="flex flex-col h-full">
-      <h2 className="text-3xl mb-2 border-b border-b-base-content">Make new Conversation</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 grow">
-        <label className="input validator w-full pl-1" htmlFor="type">
-          <AtSymbolIcon height={"90%"} />
+    const onSearchUser = (filter) => {
+        if (filter != apiData.params.q) {
+            let newAborter = apiAbort
+            if (loadingUsers) {
+                apiAbort.abort()
+                newAborter = new AbortController()
+                setApiAbort(newAborter)
+            }
+            setApiData(prev => {
+                const newData = {
+                    params: {
+                        q: filter,
+                    },
+                    signal: newAborter.signal,
+                }
 
-          <input
-            type="text"
-            className="w-full"
-            id="name"
-            placeholder="Give your conversation name"
-            value={data.name}
-            onChange={(e) => setData({ ...data, name: e.target.value })}
-            required
-          />
-        </label>
-        <div className="validator-hint hidden">Enter valid name</div>
+                // apiRefresh()
+                return newData
+            })
+        }
+    }
 
-        <div className="validator pl-1" htmlFor="type">
-          <label htmlFor="type_group">
-            <span className="mx-2 label"> Group </span>
-            <input
-              type="radio"
-              className="radio radio-primary"
-              name="type"
-              id="type_group"
-              value="group"
-              onChange={(e) => setData({ ...data, type: e.target.value })}
-              required
-            />
-          </label>
+    return (
+        <div className="flex flex-col h-full">
+            <h2 className="text-3xl mb-2 border-b border-b-base-content">Make new Conversation</h2>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 grow">
+                <label className="input validator w-full pl-1" htmlFor="type">
+                    <AtSymbolIcon height={"90%"} />
 
-          <label htmlFor="type_private">
-            <span className="mx-2 label"> / Or Private</span>
-            <input
-              type="radio"
-              className="radio radio-primary"
-              name="type"
-              id="type_private"
-              value="private"
-              onChange={(e) => setData({ ...data, type: e.target.value })}
-              required
-            />
-          </label>
+                    <input
+                        type="text"
+                        className="w-full"
+                        id="name"
+                        placeholder="Give your conversation name"
+                        value={data.name}
+                        onChange={(e) => setData({ ...data, name: e.target.value })}
+                        required
+                    />
+                </label>
+                <div className="validator-hint hidden">Enter valid name</div>
+
+                <div className="validator pl-1" htmlFor="type">
+                    <label htmlFor="type_group">
+                        <span className="mx-2 label"> Group </span>
+                        <input
+                            type="radio"
+                            className="radio radio-primary"
+                            name="type"
+                            id="type_group"
+                            value="group"
+                            onChange={(e) => setData({ ...data, type: e.target.value })}
+                            required
+                        />
+                    </label>
+
+                    <label htmlFor="type_private">
+                        <span className="mx-2 label"> / Or Private</span>
+                        <input
+                            type="radio"
+                            className="radio radio-primary"
+                            name="type"
+                            id="type_private"
+                            value="private"
+                            onChange={(e) => setData({ ...data, type: e.target.value })}
+                            required
+                        />
+                    </label>
+                </div>
+                <div className="validator-hint hidden">Enter valid type</div>
+
+                <label className="input w-full">
+                    <span className="label !me-0">Participants </span>
+                    <SearchableSelect
+                        disabled={data.type == ''}
+                        isMultiple={data.type == 'group'}
+                        inputName='users'
+                        options={users}
+                        onSearch={(q) => onSearchUser(q)}
+                        onChange={(users) => setData({ ...data, users: users.map(user => user.id) })}
+                        loading={loadingUsers}
+                        getShowInfo={(user) => { return { title: user.name, value: user.id } }}
+                        className="w-full"
+                    />
+                </label>
+
+                <div className="grow">
+
+                </div>
+
+                {errorMsg && <div className="text-error">{errorMsg}</div>}
+
+                <button
+                    type="submit"
+                    className="btn btn-primary w-full grow-0"
+                    disabled={loading}
+                >
+                    {loading ?
+                        <spin className="loading loading-infinity loading-xl text-primary"></spin>
+                        :
+                        'Make Conversation'
+                    }
+                </button>
+            </form>
         </div>
-        <div className="validator-hint hidden">Enter valid type</div>
-
-        <label className="input w-full">
-          <span className="label !me-0">Participants </span>
-          <SearchableSelect
-            disabled={data.type == ''}
-            isMultiple={data.type == 'group'}
-            inputName='users'
-            options={users}
-            onSearch={(q) => onSearchUser(q)}
-            onChange={(users) => setData({ ...data, users: users.map(user => user.id) })}
-            loading={loadingUsers}
-            getShowInfo={(user) => { return { title: user.name, value: user.id } }}
-            className="w-full"
-          />
-        </label>
-
-        <div className="grow">
-
-        </div>
-
-        {errorMsg && <div className="text-error">{errorMsg}</div>}
-
-        <button
-          type="submit"
-          className="btn btn-primary w-full grow-0"
-          disabled={loading}
-        >
-          {loading ?
-            <spin className="loading loading-infinity loading-xl text-primary"></spin>
-            :
-            'Make Conversation'
-          }
-        </button>
-      </form>
-    </div>
-  )
+    )
 }

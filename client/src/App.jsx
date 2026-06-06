@@ -14,58 +14,58 @@ import ConversationPage from './pages/Chat/ConversationPage'
 import { ChatProvider } from './contexts/ChatContext'
 
 function ProtectedRoute() {
-  const { user, loading } = useAuth()
+    const { user, loading } = useAuth()
 
-  if (loading) {
-    return null // oder Spinner
-  }
+    if (loading) {
+        return null // oder Spinner
+    }
 
-  return user ? <Outlet /> : <Navigate to="/login" replace />
+    return user ? <Outlet /> : <Navigate to="/login" replace />
 }
 
 function GuestRoute() {
-  const { user, loading } = useAuth()
+    const { user, loading } = useAuth()
 
-  if (loading) {
-    return null // oder Spinner
-  }
+    if (loading) {
+        return null // oder Spinner
+    }
 
-  return !user ? <Outlet /> : <Navigate to="/" replace />
+    return !user ? <Outlet /> : <Navigate to="/" replace />
 }
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
 
-        {/* Nur für Gäste */}
-        <Route element={<GuestRoute />}>
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-        </Route>
+                {/* Nur für Gäste */}
+                <Route element={<GuestRoute />}>
+                    <Route element={<AuthLayout />}>
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                    </Route>
+                </Route>
 
-        {/* Nur für eingeloggte Benutzer */}
-        <Route element={<ProtectedRoute />}>
-          <Route element={<MainLayout />}>
-            <Route path="/chat" element={<ChatHome />} />
-            <Route
-              path="/chat/:conversationId"
-              element={
-                <ChatProvider>
-                  <ConversationPage />
-                </ChatProvider>
-              }
-            />
-          </Route>
-        </Route>
+                {/* Nur für eingeloggte Benutzer */}
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<MainLayout />}>
+                        <Route path="/chat" element={<ChatHome />} />
+                        <Route
+                            path="/chat/:conversationId"
+                            element={
+                                <ChatProvider>
+                                    <ConversationPage />
+                                </ChatProvider>
+                            }
+                        />
+                    </Route>
+                </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  )
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </BrowserRouter>
+    )
 }
 
 /*import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'

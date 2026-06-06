@@ -4,17 +4,17 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
-  build: {
-    outDir: '../public/dist',
-    emptyOutDir: true,
-  },
-  esbuild: {
-    supported: {
-      'top-level-await': true //browsers can handle top-level-await features
+    plugins: [
+        react(),
+        tailwindcss(),
+    ],
+    build: {
+        outDir: '../public/dist',
+        emptyOutDir: true,
     },
-  }
+    esbuild: {
+        supported: {
+            'top-level-await': true //browsers can handle top-level-await features
+        },
+    }
 })
