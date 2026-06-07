@@ -28,7 +28,7 @@ class ConversationController extends Controller
             ->participants()
             ->where('user_id', $request->user()->id)
             ->first();
-            
+
         $read_participant->update(['last_read_at' => (new Carbon(now()))->toDateTimeString()]);
         info('readeed participant:', $read_participant->toArray());
         broadcast(new ConversationRead($read_participant));

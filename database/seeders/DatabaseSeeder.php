@@ -6,7 +6,6 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Participant;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

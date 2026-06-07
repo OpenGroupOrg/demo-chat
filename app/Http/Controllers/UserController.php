@@ -13,14 +13,14 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // Fetch all users, possibly applying filters from the request
-        if($request->has('q')){
+        if ($request->has('q')) {
             $filter = $request->query('q');
             $users = User::whereLike('name', '%' . $filter . '%')
                 ->orWhereLike('email', '%' . $filter . '%')
                 ->latest()
                 ->limit(10)
                 ->get();
-        }else{
+        } else {
             $users = User::latest()->limit(10)->get();
         }
         return response()->json($users);
@@ -57,7 +57,8 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function authUser(Request $request){
+    public function authUser(Request $request)
+    {
         return response()->json($request->user());
     }
 

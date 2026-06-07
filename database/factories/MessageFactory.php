@@ -8,7 +8,6 @@ use App\Models\Conversation;
 use App\Models\User;
 use App\Providers\FakerServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Storage;
 
 class MessageFactory extends Factory
 {
@@ -20,9 +19,9 @@ class MessageFactory extends Factory
             'conversation_id' => Conversation::factory(),
             'content' => fake()->paragraph,
             'attachments' => fake()->optional(.8)->randomElements([
-                $this->faker->imageUrl( 300, 200, null, true, false, null, 'jpg'),
-                $this->faker->imageUrl( 300, 100, null, true, false, null, 'jpg'),
-                $this->faker->imageUrl( 400, 200, null, true, false, null, 'jpg'),
+                $this->faker->imageUrl(300, 200, null, true, false, null, 'jpg'),
+                $this->faker->imageUrl(300, 100, null, true, false, null, 'jpg'),
+                $this->faker->imageUrl(400, 200, null, true, false, null, 'jpg'),
             ], rand(1, 3)),
             'edited_at' => null,
         ];
