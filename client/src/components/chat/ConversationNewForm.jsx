@@ -33,6 +33,8 @@ export default function ConversationNewForm() {
         }
     })
 
+    console.log('Users for Search:', users)
+
     // 2. Mutation für die neue Konversation
     const createConversation = useMutation({
         mutationFn: async (newConversation) => {
@@ -51,6 +53,8 @@ export default function ConversationNewForm() {
             setErrorMsg(error.response?.data?.message || 'Creation failed');
         }
     })
+
+    console.log('Conversation Data:', data)
 
     // 3. Form Submit
     const handleSubmit = (e) => {

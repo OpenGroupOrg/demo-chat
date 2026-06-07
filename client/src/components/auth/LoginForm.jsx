@@ -7,7 +7,6 @@ import { loginUser } from '../../api/auth'
 
 export default function LoginForm() {
     const [credentials, setCredentials] = useState({ email: '', password: '' })
-
     const { setUser } = useAuth()
     const navigate = useNavigate()
 
@@ -16,14 +15,9 @@ export default function LoginForm() {
         onSuccess: (data) => {
             console.info('Logged in Successfully!')
 
-            // Tokens speichern
-            localStorage.setItem('auth_token', data.token)
-            localStorage.setItem('auth_type', 'Bearer')
-
-            if (data.user) {
-                setUser(data.user)
-            }
-
+            // Da loginUser jetzt intern Tokens speichert, müssen wir hier nichts mehr machen.
+            // Wir setzen nur noch den Context für React.
+            setUser(data.user)
             navigate('/')
         }
     })
