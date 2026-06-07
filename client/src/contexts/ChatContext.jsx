@@ -24,8 +24,6 @@ export const ChatProvider = ({ children }) => {
         }
     })
 
-    console.log('Loaded Conversation:', data)
-
     // 2. Nachricht löschen Mutation
     const deleteMessageMutation = useMutation({
         mutationFn: async (messageId) => {
@@ -35,8 +33,6 @@ export const ChatProvider = ({ children }) => {
             queryClient.invalidateQueries({ queryKey: ['conversation', currentConvId] })
         }
     })
-
-    console.log('Delete Message Mutation State:', deleteMessageMutation)
 
     // 3. Nachricht senden Mutation (NEU!)
     const sendMessageMutation = useMutation({
@@ -53,8 +49,6 @@ export const ChatProvider = ({ children }) => {
             return response.data
         }
     })
-
-    console.log('Send Message Mutation State:', sendMessageMutation)
 
     // Neu laden, wenn sich die ID ändert
     useEffect(() => {
